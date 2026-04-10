@@ -3,6 +3,7 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { Card } from '../common/Card';
 import { EmptyState } from '../common/EmptyState';
 import { formatCurrency } from '../../utils/formatting';
+import { PersonStanding } from 'lucide-react';
 
 interface PersonChartDataItem {
   name: string;
@@ -18,7 +19,9 @@ export const PersonChart: React.FC<PersonChartProps> = ({ data }) => {
   if (data.length === 0) {
     return (
       <Card>
-        <EmptyState icon="📈" title="Sin personas" description="Agrega miembros para ver datos" />
+        <EmptyState title="Sin personas" description="Agrega miembros para ver datos">
+          <PersonStanding size={56} />
+        </EmptyState>
       </Card>
     );
   }

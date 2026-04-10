@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useExpenseStore } from '../../store/expenseStore';
 import { GroupModal } from '../groups/GroupModal';
 import { Button } from '../common/Button';
+import { Menu, Plus, Users } from 'lucide-react';
 
 interface SidebarProps {
   open: boolean;
@@ -29,7 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onToggle }) => {
             className="p-1 hover:bg-indigo-800 rounded transition-colors"
             aria-label="Toggle sidebar"
           >
-            {open ? '←' : '→'}
+            <Menu />
           </button>
         </div>
 
@@ -57,7 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onToggle }) => {
                       <p className="text-xs text-indigo-200">{group.members.length} miembros</p>
                     </div>
                   ) : (
-                    <div className="text-center text-lg">👥</div>
+                    <Users />
                   )}
                 </button>
               ))}
@@ -68,9 +69,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onToggle }) => {
             onClick={() => setShowGroupModal(true)}
             variant="secondary"
             size="sm"
-            className={`w-full ${!open ? 'px-1' : ''}`}
+            className={`w-full flex gap-1 items-center justify-center ${!open ? 'px-1' : ''}`}
           >
-            {open ? '+ Nuevo Grupo' : '+'}
+            <Plus size={16}/>
+            {open ? ' Nuevo Grupo' : ''}
           </Button>
         </div>
 

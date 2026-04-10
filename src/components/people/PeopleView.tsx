@@ -5,6 +5,7 @@ import { PersonBadge } from './PersonBadge';
 import { PersonForm } from './PersonForm';
 import { EmptyState } from '../common/EmptyState';
 import { ConfirmDialog } from '../common/ConfirmDialog';
+import { Users } from 'lucide-react';
 
 export const PeopleView: React.FC = () => {
   const {
@@ -54,10 +55,11 @@ export const PeopleView: React.FC = () => {
         </h3>
         {people.length === 0 ? (
           <EmptyState
-            icon="👥"
             title="Sin miembros"
             description="Agrega personas al grupo para comenzar a registrar gastos"
-          />
+          >
+            <Users size={56} />
+          </EmptyState>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {people.map((person) => (

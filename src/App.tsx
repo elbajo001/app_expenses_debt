@@ -1,17 +1,46 @@
 import { useEffect } from 'react';
+import { useAuth } from './contexts/AuthContext';
 import { useExpenseStore } from './store/expenseStore';
 import { Layout } from './components/layout/Layout';
 import { WelcomeScreen } from './components/layout/WelcomeScreen';
+import { LoginView } from './components/layout/LoginView';
 import { ToastProvider } from './contexts/ToastContext';
 import { ToastContainer } from './components/ToastContainer';
 
 export default function App() {
-  const { groups, activeGroupId, setActiveGroup } = useExpenseStore();
+  const { user, isLoading } = useAuth();
+  const { groups, activeGroupId, setActiveGroup, setCurrentUserId } = useExpenseStore();
 
+  // Set current user in store when auth changes
   useEffect(() => {
-    if (!activeGroupId && groups.length > 0) 
+    if (user) {
+      setCurrentUserId(user.id);
+    }
+  }, [user, setCurrentUserId]);
+
+  // Set active group when groups update
+  useEffect(() => {
+    if (!activeGroupId && groups.length > 0) {
       setActiveGroup(groups[0].id);
+    }
   }, [groups, activeGroupId, setActiveGroup]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="inline-block mb-4">
+            <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+          </div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginView />;
+  }
 
   const content = groups.length === 0 ? <WelcomeScreen /> : <Layout />;
 

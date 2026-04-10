@@ -10,12 +10,14 @@ const PERSON_COLORS = [
 ];
 
 interface ExpenseStoreState {
+  currentUserId: string | null;
   groups: Group[];
   people: Person[];
   expenses: Expense[];
   activeGroupId: string | null;
 
-  addGroup: (data: Omit<Group, 'id' | 'createdAt'>) => void;
+  setCurrentUserId: (userId: string) => void;
+  addGroup: (data: Omit<Group, 'id' | 'createdAt' | 'userId'>) => void;
   updateGroup: (id: string, data: Partial<Pick<Group, 'name' | 'description'>>) => void;
   deleteGroup: (id: string) => void;
   setActiveGroup: (id: string | null) => void;
@@ -23,14 +25,22 @@ interface ExpenseStoreState {
   addPerson: (groupId: string, name: string) => void;
   removePerson: (groupId: string, personId: string) => void;
 
-  addExpense: (data: Omit<Expense, 'id' | 'createdAt'>) => void;
-  updateExpense: (id: string, data: Partial<Omit<Expense, 'id' | 'groupId' | 'createdAt'>>) => void;
+  addExpense: (data: Omit<Expense, 'id' | 'createdAt' | 'userId'>) => void;
+  updateExpense: (id: string, data: Partial<Omit<Expense, 'id' | 'groupId' | 'createdAt' | 'userId'>>) => void;
   deleteExpense: (id: string) => void;
 
   getGroupById: (id: string) => Group | undefined;
   getPeopleByGroup: (groupId: string) => Person[];
   getExpensesByGroup: (groupId: string) => Expense[];
   getPersonById: (id: string) => Person | undefined;
+}
+
+interface GroupWithUser extends Group {
+  userId?: string;
+}
+
+interface ExpenseWithUser extends Expense {
+  userId?: string;
 }
 
 const getNextAvailableColor = (existingPeople: Person[]): string => {
@@ -44,17 +54,26 @@ const getNextAvailableColor = (existingPeople: Person[]): string => {
 export const useExpenseStore = create<ExpenseStoreState>()(
   persist(
     (set, get) => ({
+      currentUserId: null,
       groups: [],
       people: [],
       expenses: [],
       activeGroupId: null,
 
+      setCurrentUserId: (userId) => {
+        set({ currentUserId: userId });
+      },
+
       addGroup: (data) => {
-        const newGroup: Group = {
+        const userId = get().currentUserId;
+        if (!userId) return;
+
+        const newGroup: GroupWithUser = {
           id: uuidv4(),
           ...data,
           members: [],
           createdAt: new Date().toISOString(),
+          userId,
         };
         set((state) => ({
           groups: [...state.groups, newGroup],
@@ -118,10 +137,14 @@ export const useExpenseStore = create<ExpenseStoreState>()(
       },
 
       addExpense: (data) => {
-        const newExpense: Expense = {
+        const userId = get().currentUserId;
+        if (!userId) return;
+
+        const newExpense: ExpenseWithUser = {
           id: uuidv4(),
           ...data,
           createdAt: new Date().toISOString(),
+          userId,
         };
         set((state) => ({
           expenses: [...state.expenses, newExpense],
@@ -143,7 +166,8 @@ export const useExpenseStore = create<ExpenseStoreState>()(
       },
 
       getGroupById: (id) => {
-        return get().groups.find((group) => group.id === id);
+        const userId = get().currentUserId;
+        return get().groups.find((group) => group.id === id && (group as GroupWithUser).userId === userId);
       },
 
       getPeopleByGroup: (groupId) => {
@@ -153,7 +177,8 @@ export const useExpenseStore = create<ExpenseStoreState>()(
       },
 
       getExpensesByGroup: (groupId) => {
-        return get().expenses.filter((expense) => expense.groupId === groupId);
+        const userId = get().currentUserId;
+        return get().expenses.filter((expense) => expense.groupId === groupId && (expense as ExpenseWithUser).userId === userId);
       },
 
       getPersonById: (id) => {

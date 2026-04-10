@@ -5,6 +5,7 @@ import { calculateDebts } from '../../utils/calculations';
 import { EmptyState } from '../common/EmptyState';
 import { formatCurrency } from '../../utils/formatting';
 import { PaymentModal } from '../modals/PaymentModal';
+import { PartyPopper } from 'lucide-react';
 
 export const DebtsView: React.FC = () => {
   const { activeGroupId, getPeopleByGroup, getExpensesByGroup } = useExpenseStore();
@@ -20,10 +21,11 @@ export const DebtsView: React.FC = () => {
   if (debts.length === 0) {
     return (
       <EmptyState
-        icon="🎉"
         title="¡Todos al día!"
         description="No hay deudas pendientes. Todos los gastos han sido liquidados."
-      />
+      >
+        <PartyPopper size={56} />
+      </EmptyState>
     );
   }
 

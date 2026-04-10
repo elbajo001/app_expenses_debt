@@ -3,6 +3,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card } from '../common/Card';
 import { EmptyState } from '../common/EmptyState';
 import { formatCurrency } from '../../utils/formatting';
+import { ChartColumnStacked } from 'lucide-react';
 
 interface CategoryChartProps {
   data: Array<{ category: string; label: string; amount: number }>;
@@ -13,7 +14,9 @@ export const CategoryChart: React.FC<CategoryChartProps> = ({ data, colors }) =>
   if (data.length === 0) {
     return (
       <Card>
-        <EmptyState icon="📊" title="Sin categorías" description="Registra gastos para ver datos" />
+        <EmptyState title="Sin categorías" description="Registra gastos para ver datos">
+          <ChartColumnStacked size={56} />
+        </EmptyState>
       </Card>
     );
   }

@@ -2,6 +2,7 @@ import React from 'react';
 import type { Expense, Person } from '../../types';
 import { EmptyState } from '../common/EmptyState';
 import { ExpenseCard } from './ExpenseCard';
+import { Banknote } from 'lucide-react';
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -19,10 +20,11 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
   if (expenses.length === 0) {
     return (
       <EmptyState
-        icon="💸"
         title="Sin gastos"
         description="No hay gastos registrados. Crea uno para comenzar."
-      />
+      >
+        <Banknote size={56} />
+      </EmptyState>
     );
   }
 
