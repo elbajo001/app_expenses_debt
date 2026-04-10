@@ -1,7 +1,8 @@
-import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
-import { useAuth } from '../contexts/AuthContext';
-import { Card } from './common/Card';
-import { Button } from './common/Button';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import type { CredentialResponse } from '@react-oauth/google';
+import { useAuth } from '../../contexts/AuthContext';
+import { Card } from '../common/Card';
+import { Button } from '../common/Button';
 
 const GOOGLE_CLIENT_ID = '1037712146378-4o732l7sfn12f0do4jdb0c40j863grce.apps.googleusercontent.com';
 
