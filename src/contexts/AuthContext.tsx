@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { useExpenseStore } from '../store/expenseStore';
 
 export interface User {
   id: string;
@@ -29,6 +30,7 @@ interface DecodedToken {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { clearStore } = useExpenseStore();
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -89,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem('auth_token');
+    clearStore();
     setUser(null);
   };
 

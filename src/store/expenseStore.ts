@@ -17,6 +17,7 @@ interface ExpenseStoreState {
   activeGroupId: string | null;
 
   setCurrentUserId: (userId: string) => void;
+  clearStore: () => void;
   addGroup: (data: Omit<Group, 'id' | 'createdAt' | 'userId'>) => void;
   updateGroup: (id: string, data: Partial<Pick<Group, 'name' | 'description'>>) => void;
   deleteGroup: (id: string) => void;
@@ -64,6 +65,16 @@ export const useExpenseStore = create<ExpenseStoreState>()(
 
       setCurrentUserId: (userId) => {
         set({ currentUserId: userId });
+      },
+
+      clearStore: () => {
+        set({
+          currentUserId: null,
+          groups: [],
+          people: [],
+          expenses: [],
+          activeGroupId: null,
+        });
       },
 
       addGroup: (data) => {
