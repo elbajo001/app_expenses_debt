@@ -68,6 +68,9 @@ export const useExpenseStore = create<ExpenseStoreState>()(
       },
 
       clearStore: () => {
+        // Clear localStorage persistence
+        localStorage.removeItem('expense-app-storage');
+        // Clear state
         set({
           currentUserId: null,
           groups: [],
