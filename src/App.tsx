@@ -12,20 +12,23 @@ export default function App() {
   const { activeGroupId, setActiveGroup, setCurrentUserId, getUserGroups, getGroupById } = useExpenseStore();
   const groups = getUserGroups();
 
-  // Set current user in store when auth changes and reset active group
+  // Set current user in store when auth changes
   useEffect(() => {
     if (user) {
       setCurrentUserId(user.id);
-      // Reset active group if it doesn't belong to the current user
-      if (activeGroupId) {
-        const currentGroup = getGroupById(activeGroupId);
-        if (!currentGroup) {
-          // Group doesn't exist for this user, reset active group
-          setActiveGroup(null);
-        }
+    }
+  }, [user?.id, setCurrentUserId]);
+
+  // Reset active group if it doesn't belong to current user
+  useEffect(() => {
+    if (user && activeGroupId) {
+      const currentGroup = getGroupById(activeGroupId);
+      if (!currentGroup) {
+        // Group doesn't exist for this user, reset active group
+        setActiveGroup(null);
       }
     }
-  }, [user, setCurrentUserId, activeGroupId, setActiveGroup, getGroupById]);
+  }, [user?.id, activeGroupId, getGroupById, setActiveGroup]);
 
   // Set active group when groups update
   useEffect(() => {
