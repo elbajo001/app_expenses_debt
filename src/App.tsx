@@ -9,19 +9,26 @@ import { ToastContainer } from './components/ToastContainer';
 
 export default function App() {
   const { user, isLoading } = useAuth();
-  const { activeGroupId, setActiveGroup, setCurrentUserId, getUserGroups } = useExpenseStore();
+  const { activeGroupId, setActiveGroup, setCurrentUserId, getUserGroups, getGroupById } = useExpenseStore();
   const groups = getUserGroups();
 
-  // Set current user in store when auth changes
+  // Set current user in store when auth changes and reset active group
   useEffect(() => {
     if (user) {
       setCurrentUserId(user.id);
+      // Reset active group if it doesn't belong to the current user
+      if (activeGroupId) {
+        const currentGroup = getGroupById(activeGroupId);
+        if (!currentGroup) {
+          // Group doesn't exist for this user, reset active group
+          setActiveGroup(null);
+        }
+      }
     }
-  }, [user, setCurrentUserId]);
+  }, [user, setCurrentUserId, activeGroupId, setActiveGroup, getGroupById]);
 
   // Set active group when groups update
   useEffect(() => {
-    console.log('Groups updated:', groups); 
     if (!activeGroupId && groups.length > 0) {
       setActiveGroup(groups[0].id);
     }
