@@ -21,6 +21,7 @@ export default function App() {
 
   // Set active group when groups update
   useEffect(() => {
+    console.log('Groups updated:', groups); 
     if (!activeGroupId && groups.length > 0) {
       setActiveGroup(groups[0].id);
     }

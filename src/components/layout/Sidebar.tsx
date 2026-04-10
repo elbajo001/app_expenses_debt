@@ -10,7 +10,8 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onToggle }) => {
-  const { groups, activeGroupId, setActiveGroup } = useExpenseStore();
+  const { getUserGroups, activeGroupId, setActiveGroup } = useExpenseStore();
+  const groups = getUserGroups();
   const [showGroupModal, setShowGroupModal] = useState(false);
 
   return (
