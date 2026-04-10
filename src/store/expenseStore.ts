@@ -33,6 +33,8 @@ interface ExpenseStoreState {
   getPeopleByGroup: (groupId: string) => Person[];
   getExpensesByGroup: (groupId: string) => Expense[];
   getPersonById: (id: string) => Person | undefined;
+  getUserGroups: () => Group[];
+  getUserExpenses: () => Expense[];
 }
 
 interface GroupWithUser extends Group {
@@ -183,6 +185,18 @@ export const useExpenseStore = create<ExpenseStoreState>()(
 
       getPersonById: (id) => {
         return get().people.find((person) => person.id === id);
+      },
+
+      getUserGroups: () => {
+        const userId = get().currentUserId;
+        if (!userId) return [];
+        return get().groups.filter((group) => (group as GroupWithUser).userId === userId);
+      },
+
+      getUserExpenses: () => {
+        const userId = get().currentUserId;
+        if (!userId) return [];
+        return get().expenses.filter((expense) => (expense as ExpenseWithUser).userId === userId);
       },
     }),
     {

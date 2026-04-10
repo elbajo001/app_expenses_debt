@@ -9,7 +9,8 @@ import { ToastContainer } from './components/ToastContainer';
 
 export default function App() {
   const { user, isLoading } = useAuth();
-  const { groups, activeGroupId, setActiveGroup, setCurrentUserId } = useExpenseStore();
+  const { activeGroupId, setActiveGroup, setCurrentUserId, getUserGroups } = useExpenseStore();
+  const groups = getUserGroups();
 
   // Set current user in store when auth changes
   useEffect(() => {
