@@ -64,6 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (credential: string) => {
     try {
+      // Clear store before login to prevent data mixing
+      clearStore();
+
       localStorage.setItem('auth_token', credential);
       let decoded: DecodedToken;
 
