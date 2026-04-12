@@ -40,7 +40,7 @@ export const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
       disabled={loading || disabled}
       className={`
-        rounded-lg font-medium transition-colors duration-200
+        flex items-center justify-center gap-2 rounded-lg font-medium transition-colors duration-200
         disabled:opacity-50 disabled:cursor-not-allowed
         ${variantClasses[variant]}
         ${sizeClasses[size]}

@@ -8,12 +8,23 @@ import { ConfirmDialog } from '../common/ConfirmDialog';
 import { Users } from 'lucide-react';
 
 export const PeopleView: React.FC = () => {
-  const {
-    activeGroupId,
-    getPeopleByGroup,
-    addPerson,
-    removePerson,
-  } = useExpenseStore();
+  // const {
+  //   activeGroupId,
+  //   getPeopleByGroup,
+  //   addPerson,
+  //   removePerson,
+  // } = useExpenseStore(); No hacer esto ya que no se renderiza al cambiar el estado (no es un hook)
+  const activeGroupId = useExpenseStore(state => state.activeGroupId);
+  const groups = useExpenseStore(state => state.groups);
+  const peopleInit = useExpenseStore(state => state.people);
+  const addPerson = useExpenseStore(state => state.addPerson);
+  const removePerson = useExpenseStore(state => state.removePerson);
+
+  const group = groups.find(g => g.id === activeGroupId);
+
+  const people = group
+    ? peopleInit.filter(p => group.members.includes(p.id))
+    : [];
   const { addToast } = useToast();
 
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; personId?: string }>({
@@ -21,8 +32,8 @@ export const PeopleView: React.FC = () => {
   });
 
   if (!activeGroupId) return null;
-
-  const people = getPeopleByGroup(activeGroupId);
+  
+  // const people = getPeopleByGroup(activeGroupId); No hacer ya que esto es un getter imperativo (getPeopleByGroup) durante el render, y eso no dispara re-render cuando people cambia.
 
   const handleAddPerson = (name: string) => {
     addPerson(activeGroupId, name);

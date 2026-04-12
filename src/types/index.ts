@@ -52,6 +52,10 @@ export interface Group {
   createdAt: string;
 }
 
+export interface GroupWithUser extends Group {
+  userId: string;
+}
+
 export interface Debt {
   from: string;
   to: string;

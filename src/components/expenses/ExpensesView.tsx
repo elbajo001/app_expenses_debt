@@ -8,15 +8,16 @@ import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { exportExpensesToCSV } from '../../utils/export';
+import type { ExpenseCategory } from '../../types';
+import { Download, Plus } from 'lucide-react';
 
 export const ExpensesView: React.FC = () => {
-  const {
-    activeGroupId,
-    getGroupById,
-    getPeopleByGroup,
-    getExpensesByGroup,
-    deleteExpense,
-  } = useExpenseStore();
+  const activeGroupId = useExpenseStore((state) => state.activeGroupId);
+  const allGroups = useExpenseStore((state) => state.groups);
+  const allPeople = useExpenseStore((state) => state.people);
+  const allExpenses = useExpenseStore((state) => state.expenses);
+  const deleteExpense = useExpenseStore((state) => state.deleteExpense);
+
   const { addToast } = useToast();
 
   const [showForm, setShowForm] = useState(false);
@@ -24,34 +25,55 @@ export const ExpensesView: React.FC = () => {
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; expenseId?: string }>({
     open: false,
   });
+
   const [filters, setFilters] = useState<{
     search: string;
-    category: 'food' | 'transport' | 'utilities' | 'entertainment' | 'health' | 'other' | 'all';
+    category: ExpenseCategory | 'all';
     personId: string | 'all';
     dateFrom: string;
     dateTo: string;
-  }>({
+  }>(() => ({
     search: '',
     category: 'all',
     personId: 'all',
-    dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split('T')[0],
     dateTo: new Date().toISOString().split('T')[0],
-  });
+  }));
 
-  if (!activeGroupId) return null;
+  // Filter group and people for active group
+  const group = useMemo(
+    () => allGroups.find((g) => g.id === activeGroupId) || null,
+    [allGroups, activeGroupId]
+  );
 
-  const group = getGroupById(activeGroupId);
-  const people = getPeopleByGroup(activeGroupId);
-  const allExpenses = getExpensesByGroup(activeGroupId);
+  const people = useMemo(
+    () => (group ? allPeople.filter((p) => group.members.includes(p.id)) : []),
+    [allPeople, group]
+  );
+
+  // Filter expenses for active group
+  const groupExpenses = useMemo(
+    () => (activeGroupId ? allExpenses.filter((e) => e.groupId === activeGroupId) : []),
+    [allExpenses, activeGroupId]
+  );
 
   const filteredExpenses = useMemo(() => {
-    return allExpenses.filter((expense) => {
-      if (filters.search && !expense.description.toLowerCase().includes(filters.search.toLowerCase())) {
+    return groupExpenses.filter((expense) => {
+      if (
+        filters.search &&
+        !expense.description
+          .toLowerCase()
+          .includes(filters.search.toLowerCase())
+      ) {
         return false;
       }
+
       if (filters.category !== 'all' && expense.category !== filters.category) {
         return false;
       }
+
       if (
         filters.personId !== 'all' &&
         !expense.participants.includes(filters.personId) &&
@@ -59,12 +81,17 @@ export const ExpensesView: React.FC = () => {
       ) {
         return false;
       }
+
       if (expense.date < filters.dateFrom || expense.date > filters.dateTo) {
         return false;
       }
+
       return true;
     });
-  }, [allExpenses, filters]);
+  }, [groupExpenses, filters]);
+
+  // ahora sí puedes hacer early return sin romper hooks
+  if (!activeGroupId) return null;
 
   const handleAddExpense = () => {
     setShowForm(false);
@@ -75,7 +102,10 @@ export const ExpensesView: React.FC = () => {
   const handleExportCSV = () => {
     if (group) {
       exportExpensesToCSV(filteredExpenses, people, group.name);
-      addToast(`Exportación completada: ${filteredExpenses.length} gastos`, 'success');
+      addToast(
+        `Exportación completada: ${filteredExpenses.length} gastos`,
+        'success'
+      );
     }
   };
 
@@ -90,20 +120,17 @@ export const ExpensesView: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Gastos registrados</h3>
+        <h3 className="text-lg font-semibold text-gray-900">
+          Gastos registrados
+        </h3>
+
         <div className="flex gap-2">
-          <Button
-            onClick={handleExportCSV}
-            variant="secondary"
-            size="md"
-          >
-            📥 Exportar CSV
+          <Button onClick={handleExportCSV} variant="secondary" size="md">
+            <Download /> Exportar CSV
           </Button>
-          <Button
-            onClick={() => setShowForm(true)}
-            size="md"
-          >
-            + Nuevo Gasto
+
+          <Button onClick={() => setShowForm(true)} size="md">
+            <Plus size={20}/> Nuevo Gasto
           </Button>
         </div>
       </div>
@@ -117,7 +144,9 @@ export const ExpensesView: React.FC = () => {
           setEditingExpense(expense.id);
           setShowForm(true);
         }}
-        onDelete={(expenseId) => setConfirmDelete({ open: true, expenseId })}
+        onDelete={(expenseId) =>
+          setConfirmDelete({ open: true, expenseId })
+        }
       />
 
       <Modal
@@ -131,9 +160,7 @@ export const ExpensesView: React.FC = () => {
       >
         <ExpenseForm
           groupId={activeGroupId}
-          onSubmit={() => {
-            handleAddExpense();
-          }}
+          onSubmit={handleAddExpense}
           onCancel={() => {
             setShowForm(false);
             setEditingExpense(null);

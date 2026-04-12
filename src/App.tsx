@@ -6,11 +6,18 @@ import { WelcomeScreen } from './components/layout/WelcomeScreen';
 import { LoginView } from './components/layout/LoginView';
 import { ToastProvider } from './contexts/ToastContext';
 import { ToastContainer } from './components/ToastContainer';
+import type { GroupWithUser } from './types';
 
 export default function App() {
   const { user, isLoading } = useAuth();
-  const { activeGroupId, setActiveGroup, setCurrentUserId, getUserGroups } = useExpenseStore();
-  const groups = getUserGroups();
+  const currentUserId = useExpenseStore((state) => state.currentUserId);
+  const allGroups = useExpenseStore((state) => state.groups);
+  const activeGroupId = useExpenseStore((state) => state.activeGroupId);
+  const setActiveGroup = useExpenseStore((state) => state.setActiveGroup);
+  const setCurrentUserId = useExpenseStore((state) => state.setCurrentUserId);
+
+  // Filter groups for current user
+  const groups = allGroups.filter((group) => (group as GroupWithUser).userId === currentUserId);
 
   // Set current user in store when auth changes
   useEffect(() => {
